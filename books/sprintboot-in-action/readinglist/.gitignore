@@ -1,10 +1,5 @@
-.DS_Store
-node_modules/
-coverage/
-package-lock.json
-
 .gradle
-*/build/
+/build/
 !gradle/wrapper/gradle-wrapper.jar
 
 ### STS ###
@@ -17,11 +12,11 @@ package-lock.json
 .sts4-cache
 
 ### IntelliJ IDEA ###
-*/.idea
+.idea
 *.iws
 *.iml
 *.ipr
-*/out/
+/out/
 
 ### NetBeans ###
 /nbproject/private/
