@@ -3,6 +3,7 @@ package money;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,6 +22,7 @@ public class DollarTest {
     assertNotEquals(new Dollar(5), new Dollar(6));
     assertEquals(new Franc(5), new Franc(5));
     assertNotEquals(new Franc(5), new Franc(6));
+    assertNotEquals(new Franc(5), new Dollar(5));
   }
 
   @Test
