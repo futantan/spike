@@ -1,9 +1,9 @@
 package money;
 
-abstract class Money {
+class Money {
 
   int amount;
-  private String currency;
+  String currency;
 
   Money(int amount, String currency) {
     this.amount = amount;
@@ -18,14 +18,21 @@ abstract class Money {
     return new Franc(amount, "CHF");
   }
 
-  abstract Money times(int multiplier);
-
   String currency() {
     return currency;
   }
 
   public boolean equals(Object obj) {
     Money money = (Money) obj;
-    return amount == money.amount && getClass().equals(money.getClass());
+    return amount == money.amount && currency().equals(money.currency());
+  }
+
+  @Override
+  public String toString() {
+    return amount + " " + currency;
+  }
+
+  Money times(int multiplier) {
+    return new Money(amount * multiplier, currency);
   }
 }
