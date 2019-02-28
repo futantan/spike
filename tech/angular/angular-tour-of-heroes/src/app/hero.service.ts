@@ -12,6 +12,12 @@ export class HeroService {
   constructor(private messageService: MessageService) {
   }
 
+  getHero(id: number): Observable<Hero> {
+    // TODO: senf the message _after_ fetching the hero
+    this.messageService.add(`HeroService: fetch hero id=${id}`);
+    return of(HEROES.find(hero => hero.id === id));
+  }
+
   getHeroes(): Observable<Hero[]> {
     // TODO: send the message _after_ fetching the heroes
     this.messageService.add('HeroService: fetched heroes');
