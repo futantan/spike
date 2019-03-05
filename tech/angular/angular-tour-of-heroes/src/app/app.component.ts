@@ -7,8 +7,4 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Tour of Hero';
-
-  test(message: string) {
-    console.log('in test', message);
-  }
 }
