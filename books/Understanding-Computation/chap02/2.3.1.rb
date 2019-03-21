@@ -30,7 +30,7 @@ class Add < Struct.new(:left, :right)
   def to_s
     "#{left} + #{right}"
   end
-  
+
   def inspect
     "«#{self}»"
   end
@@ -52,9 +52,9 @@ class Multiply < Struct.new(:left, :right)
   end
 
   def to_s
-    "#{left} * #{right}"    
+    "#{left} * #{right}"
   end
-  
+
   def inspect
     "«#{self}»"
   end
@@ -76,13 +76,13 @@ end
 
 class LessThan < Struct.new(:left, :right)
   def to_s
-    "#{left} < #{right}"    
+    "#{left} < #{right}"
   end
 
   def inspect
     "«#{self}»"
   end
-  
+
   def reducible?
     true
   end
@@ -104,7 +104,7 @@ class Variable < Struct.new(:name)
   end
 
   def inspect
-    "«#{self}»"    
+    "«#{self}»"
   end
 
   def reducible?
@@ -122,7 +122,7 @@ class DoNothing
   end
 
   def inspect
-    "«#{self}»"        
+    "«#{self}»"
   end
 
   def ==(other_statement)
@@ -134,13 +134,13 @@ class DoNothing
   end
 end
 
-class Assign < Struct.new(:name, :expression) 
+class Assign < Struct.new(:name, :expression)
   def to_s
     "#{name} = #{expression}"
   end
 
   def inspect
-    "«#{self}»"    
+    "«#{self}»"
   end
 
   def reducible?
@@ -156,13 +156,13 @@ class Assign < Struct.new(:name, :expression)
   end
 end
 
-class If < Struct.new(:condition, :consequence, :alternative) 
+class If < Struct.new(:condition, :consequence, :alternative)
   def to_s
     "if (#{condition}) { #{consequence} } else { #{alternative} }"
   end
 
   def inspect
-    "«#{self}»"    
+    "«#{self}»"
   end
 
   def reducible?
@@ -189,7 +189,7 @@ class Sequence < Struct.new(:first, :second)
   end
 
   def inspect
-    "«#{self}»"    
+    "«#{self}»"
   end
 
   def reducible?
@@ -205,7 +205,7 @@ class Sequence < Struct.new(:first, :second)
       [Sequence.new(reduced_first, second), reduced_environment]
     end
   end
-  
+
 end
 
 class While < Struct.new(:condition, :body)
@@ -214,7 +214,7 @@ class While < Struct.new(:condition, :body)
   end
 
   def inspect
-    "«#{self}»"            
+    "«#{self}»"
   end
 
   def reducible?
