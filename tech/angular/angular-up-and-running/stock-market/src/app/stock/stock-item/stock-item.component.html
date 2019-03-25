@@ -1,3 +1,7 @@
-<p>
-  stock-item works!
-</p>
+<div class="stock-container">
+  <div class="name">{{stock.name + ' (' + stock.code + ')'}}</div>
+  <div class="price" [class]="stock.isPositiveChange() ? 'positive' : 'negative'">
+    $ {{stock.price}}
+  </div>
+  <button (click)="toggleFavorite()" [disabled]="stock.favorite">Add to Favorite</button>
+</div>
