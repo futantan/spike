@@ -1,11 +1,6 @@
 <div style="text-align: center">
   <h1>
-    Welcome to {{title}}
+    Stock Market App
   </h1>
-  <app-stock-item [stock]="stock" (toggleFavorite)="onToggleFavorite($event)">
-    <button (click)="testMethod()">With Button 1</button>
-  </app-stock-item>
-  <app-stock-item [stock]="stock" (toggleFavorite)="onToggleFavorite($event)">
-    No buttons for you!
-  </app-stock-item>
+  <app-stock-item [stock]="stock" (toggleFavorite)="onToggleFavorite($event)"></app-stock-item>
 </div>
