@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   private counter = 1;
 
   ngOnInit(): void {
-    this.stock = new Stock('Test Stock Company', 'TSC', 85, 80);
+    this.stock = new Stock('Test Stock Company', 'TSC', 85, 80, '');
   }
 
   onToggleFavorite(stock: Stock) {

@@ -3,6 +3,8 @@ import { Stock } from './model/stock';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { StockItemComponent } from './stock/stock-item/stock-item.component';
+import { CreateStockComponent } from './stock/create-stock/create-stock.component';
+import { FormsModule } from '@angular/forms';
 
 describe('AppComponent', () => {
   describe('Simple, No Angular Unit Test', () => {
@@ -11,7 +13,7 @@ describe('AppComponent', () => {
       expect(appComponent.stock).toBeUndefined();
       appComponent.ngOnInit();
       expect(appComponent.stock).toEqual(
-        new Stock('Test Stock Company', 'TSC', 85, 80)
+        new Stock('Test Stock Company', 'TSC', 85, 80, '')
       );
     });
 
@@ -19,9 +21,9 @@ describe('AppComponent', () => {
       const appComponent = new AppComponent();
       appComponent.ngOnInit();
       expect(appComponent.stock.favorite).toBeFalsy();
-      appComponent.onToggleFavorite(new Stock('Test', 'TEST', 54, 55));
+      appComponent.onToggleFavorite(new Stock('Test', 'TEST', 54, 55, ''));
       expect(appComponent.stock.favorite).toBeTruthy();
-      appComponent.onToggleFavorite(new Stock('Test', 'TEST', 54, 55));
+      appComponent.onToggleFavorite(new Stock('Test', 'TEST', 54, 55, ''));
       expect(appComponent.stock.favorite).toBeFalsy();
     });
   });
@@ -33,8 +35,10 @@ describe('AppComponent', () => {
       TestBed.configureTestingModule({
         declarations: [
           AppComponent,
-          StockItemComponent
+          StockItemComponent,
+          CreateStockComponent
         ],
+        imports: [FormsModule]
       }).compileComponents();
     }));
 
@@ -58,13 +62,13 @@ describe('AppComponent', () => {
 
     it('should toggle stock favorite correctly', () => {
       expect(component.stock.favorite).toBeFalsy();
-      let addToFavoriteBtnEl = fixture.debugElement.query(By.css('button'));
+      let addToFavoriteBtnEl = fixture.debugElement.query(By.css('.toggle'));
       expect(addToFavoriteBtnEl).toBeDefined();
       addToFavoriteBtnEl.triggerEventHandler('click', null);
 
       fixture.detectChanges();
       expect(component.stock.favorite).toBeTruthy();
-      addToFavoriteBtnEl = fixture.debugElement.query(By.css('button'));
+      addToFavoriteBtnEl = fixture.debugElement.query(By.css('.toggle'));
       expect(addToFavoriteBtnEl).toBeNull();
     });
   });
