@@ -1,10 +1,10 @@
 module ApplicationHelper
   def full_title(page_title = '')
-    base_titile = "Ruby on Rails Tutorial Sample App"
+    base_title = "Ruby on Rails Tutorial Sample App"
     if page_title.empty?
-      base_titile
+      base_title
     else
-      page_title + " | " + base_titile
+      page_title + " | " + base_title
     end
   end
 end
