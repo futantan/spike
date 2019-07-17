@@ -60,25 +60,36 @@ IS_LESS_OR_EQUAL = -> m { -> n { IS_ZERO[SUBTRACT[m][n]]}}
 # puts to_boolean(IS_LESS_OR_EQUAL[TWO][TWO])
 # puts to_boolean(IS_LESS_OR_EQUAL[THREE][TWO])
 
-MOD = -> m { -> n {
+# MOD = -> m { -> n {
+#   IF[IS_LESS_OR_EQUAL[n][m]][
+#     -> x {
+#       MOD[SUBTRACT[m][n]][n][x]
+#     }
+#   ][
+#     m
+#   ]
+# }}
+
+Z = -> f { -> x { f[-> y { x[x][y] }] }[-> x { f[-> y { x[x][y] }] }] }
+MOD = Z[-> f { -> m { -> n {
   IF[IS_LESS_OR_EQUAL[n][m]][
     -> x {
-      MOD[SUBTRACT[m][n]][n][x]
+      f[SUBTRACT[m][n]][n][x]
     }
   ][
     m
   ]
-}}
+}}}]
 
 # puts to_integer(MOD[THREE][TWO])
 # puts to_integer(MOD[POWER[THREE][THREE]][ADD[THREE][TWO]])
 
 a = (ONE..HUNDRED).map do |n|
-  IF[IS_ZERO[n % FIFTEEN]][
+  IF[IS_ZERO[MOD[n][FIFTEEN]]][
     'FuzzBuzz'
-  ][IF[IS_ZERO[n % THREE]][
+  ][IF[IS_ZERO[MOD[n][THREE]]][
    'Fizz'
-  ][IF[IS_ZERO[n % FIVE]][
+  ][IF[IS_ZERO[MOD[n][FIVE]]][
     'Buzz'
   ][
     n.to_s
