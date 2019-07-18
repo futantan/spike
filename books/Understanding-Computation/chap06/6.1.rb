@@ -174,14 +174,28 @@ I   = INCREMENT[F]
 U   = INCREMENT[I]
 ZED = INCREMENT[U]
 
+FIZZ     = UNSHIFT[UNSHIFT[UNSHIFT[UNSHIFT[EMPTY][ZED]][ZED]][I]][F]
+BUZZ     = UNSHIFT[UNSHIFT[UNSHIFT[UNSHIFT[EMPTY][ZED]][ZED]][U]][B]
+FIZZBUZZ = UNSHIFT[UNSHIFT[UNSHIFT[UNSHIFT[BUZZ][ZED]][ZED]][I]][F]
+
+def to_char(c)
+  '0123456789BFiuz'.slice(to_integer(c))
+end
+
+def to_string(s)
+  to_array(s).map { |c| to_char(c) }.join
+end
+
+# puts to_char(ZED)
+# puts to_string(FIZZBUZZ)
 
 a = MAP[RANGE[ONE][HUNDRED]][-> n {
   IF[IS_ZERO[MOD[n][FIFTEEN]]][
-    'FuzzBuzz'
+    FIZZBUZZ
   ][IF[IS_ZERO[MOD[n][THREE]]][
-   'Fizz'
+   FIZZ
   ][IF[IS_ZERO[MOD[n][FIVE]]][
-    'Buzz'
+    BUZZ
   ][
     n.to_s
   ]]]
