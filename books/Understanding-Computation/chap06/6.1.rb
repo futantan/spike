@@ -84,7 +84,74 @@ MOD = Z[-> f { -> m { -> n {
 # puts to_integer(MOD[THREE][TWO])
 # puts to_integer(MOD[POWER[THREE][THREE]][ADD[THREE][TWO]])
 
-a = (ONE..HUNDRED).map do |n|
+EMPTY    = PAIR[TRUE][TRUE]
+UNSHIFT  = -> l { -> x {
+  PAIR[FALSE][PAIR[x][l]]
+}}
+IS_EMPTY = LEFT
+FIRST    = -> l { LEFT[RIGHT[l]] }
+REST     = -> l { RIGHT[RIGHT[l]] }
+
+my_list = UNSHIFT[
+  UNSHIFT[
+    UNSHIFT[EMPTY][THREE]
+  ][TWO]
+][ONE]
+
+# puts to_integer(FIRST[my_list])
+# puts to_integer(FIRST[REST[my_list]])
+# puts to_integer(FIRST[REST[REST[my_list]]])
+# puts to_boolean(IS_EMPTY[my_list])
+# puts to_boolean(IS_EMPTY[EMPTY])
+def to_array(proc)
+  array = []
+
+  until to_boolean(IS_EMPTY[proc])
+    array.push(FIRST[proc])
+    proc = REST[proc]
+  end
+
+  array
+end
+
+# puts to_array(my_list).map { |p| to_integer(p) }
+
+# def range(m, n)
+#   if m <= n
+#     range(m + 1, n).unshift(m)
+#   else
+#     []
+#   end
+# end
+# puts range(1,5)
+
+RANGE = Z[
+  -> f {
+    -> m { -> n {
+      IF[IS_LESS_OR_EQUAL[m][n]][
+        -> x {
+          UNSHIFT[f[INCREMENT[m]][n]][m][x]
+        }
+      ][
+        EMPTY
+      ]
+    }}
+  }
+]
+
+# my_range = RANGE[ONE][FIVE]
+# puts to_array(my_range).map { |p| to_integer(p) }
+
+
+TEN = MULTIPLY[TWO][FIVE]
+B   = TEN
+F   = INCREMENT[B]
+I   = INCREMENT[F]
+U   = INCREMENT[I]
+ZED = INCREMENT[U]
+
+
+a = RANGE[ONE][HUNDRED].map do |n|
   IF[IS_ZERO[MOD[n][FIFTEEN]]][
     'FuzzBuzz'
   ][IF[IS_ZERO[MOD[n][THREE]]][
