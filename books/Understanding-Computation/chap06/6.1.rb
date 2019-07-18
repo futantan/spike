@@ -142,6 +142,30 @@ RANGE = Z[
 # my_range = RANGE[ONE][FIVE]
 # puts to_array(my_range).map { |p| to_integer(p) }
 
+FOLD =
+  Z[ -> f {
+    -> l { -> x { -> g {
+      IF[IS_EMPTY[l]][
+        x
+      ][
+        -> y {
+          g[f[REST[l]][x][g]][FIRST[l]][y]
+        }
+      ]
+    }}}
+  }
+]
+# puts to_integer(FOLD[RANGE[ONE][FIVE]][ZERO][ADD])
+# puts to_integer(FOLD[RANGE[ONE][FIVE]][ONE][MULTIPLY])
+
+MAP = -> k { -> f {
+  FOLD[k][EMPTY][
+    -> l { -> x { UNSHIFT[l][f[x]]}}
+  ]
+}}
+# my_list = MAP[RANGE[ONE][FIVE]][INCREMENT]
+# puts to_array(my_list).map { |p| to_integer(p) }
+
 
 TEN = MULTIPLY[TWO][FIVE]
 B   = TEN
@@ -151,7 +175,7 @@ U   = INCREMENT[I]
 ZED = INCREMENT[U]
 
 
-a = RANGE[ONE][HUNDRED].map do |n|
+a = MAP[RANGE[ONE][HUNDRED]][-> n {
   IF[IS_ZERO[MOD[n][FIFTEEN]]][
     'FuzzBuzz'
   ][IF[IS_ZERO[MOD[n][THREE]]][
@@ -161,6 +185,6 @@ a = RANGE[ONE][HUNDRED].map do |n|
   ][
     n.to_s
   ]]]
-end
+}]
 
 puts a
