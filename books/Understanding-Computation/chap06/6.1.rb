@@ -189,16 +189,60 @@ end
 # puts to_char(ZED)
 # puts to_string(FIZZBUZZ)
 
-a = MAP[RANGE[ONE][HUNDRED]][-> n {
-  IF[IS_ZERO[MOD[n][FIFTEEN]]][
-    FIZZBUZZ
-  ][IF[IS_ZERO[MOD[n][THREE]]][
-   FIZZ
-  ][IF[IS_ZERO[MOD[n][FIVE]]][
-    BUZZ
-  ][
-    n.to_s
-  ]]]
-}]
+def to_digits(n)
+  previous_digits =
+   if n < 10
+    []
+   else
+    to_digits(n / 10)
+   end
 
-puts a
+   previous_digits.push(n % 10)
+end
+
+DIV = Z[-> f { -> m { -> n {
+  IF[IS_LESS_OR_EQUAL[n][m]][
+    -> x {
+      INCREMENT[f[SUBTRACT[m][n]][n]][x]
+    }
+  ][
+    ZERO
+  ]
+}}}]
+
+PUSH =
+  -> l {
+    -> x {
+      FOLD[l][UNSHIFT[EMPTY][x]][UNSHIFT]
+    }
+  }
+
+TO_DIGITS = Z[-> f { -> n { PUSH[
+  IF[IS_LESS_OR_EQUAL[n][DECREMENT[TEN]]][
+    EMPTY
+  ][
+    -> x {
+      f[DIV[n][TEN]][x]
+    }
+  ]
+][MOD[n][TEN]]
+}}]
+
+# puts to_array(TO_DIGITS[POWER[FIVE][THREE]]).map { |p| to_integer(p) }
+
+solution =
+  MAP[RANGE[ONE][HUNDRED]][-> n {
+    IF[IS_ZERO[MOD[n][FIFTEEN]]][
+      FIZZBUZZ
+    ][IF[IS_ZERO[MOD[n][THREE]]][
+    FIZZ
+    ][IF[IS_ZERO[MOD[n][FIVE]]][
+      BUZZ
+    ][
+      TO_DIGITS[n]
+    ]]]
+  }]
+
+to_array(solution).each do |p|
+  puts to_string(p)
+end; nil
