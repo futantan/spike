@@ -18,7 +18,10 @@ const Stockfetch = function() {
     fs.readFile(filename, processResponse);
   };
 
-  this.parseTickers = function() {};
+  this.parseTickers = function(content) {
+    const isInRightFormat = (str) => str.trim().length !== 0 && str.indexOf(' ') < 0
+    return content.split('\n').filter(isInRightFormat)
+  };
   this.processTickers = function() {};
 };
 
