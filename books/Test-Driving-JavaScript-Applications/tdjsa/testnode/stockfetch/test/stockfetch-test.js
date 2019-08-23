@@ -79,4 +79,21 @@ describe('Stockfetch tests', () => {
     const rawData = 'APPL \nBla h\nGOOG\n\n'
     expect(stockfetch.parseTickers(rawData)).to.be.eql(['GOOG'])
   })
+
+  it('processTickers should call getPrice for each ticker symbol', () => {
+    const stockfetchMock = sandbox.mock(stockfetch)
+    stockfetchMock.expects('getPrice').withArgs('A')
+    stockfetchMock.expects('getPrice').withArgs('B')
+    stockfetchMock.expects('getPrice').withArgs('C')
+
+    stockfetch.processTickers(['A', 'B', 'C'])
+    stockfetchMock.verify()
+  })
+
+  it('processTickers should save tickers count', () => {
+    sandbox.stub(stockfetch, 'getPrice')
+
+    stockfetch.processTickers(['A', 'B', 'C'])
+    expect(stockfetch.tickersCount).to.be.eql(3)
+  })
 })
