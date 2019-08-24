@@ -65,7 +65,18 @@ const Stockfetch = function() {
     this.errors[ticker] = error
     this.printReport()
   }
-  this.printReport = function() {}
+  this.printReport = function() {
+    if(this.tickersCount === Object.keys(this.prices).length + Object.keys(this.errors).length) {
+      this.reportCallback(this.sortData(this.prices), this.sortData(this.errors))
+    }
+  }
+  this.sortData = function(dataToSort) {
+    const toArray = function(key) {
+      return [key, dataToSort[key]]
+    }
+    return Object.keys(dataToSort).sort().map(toArray)
+  }
+  this.reportCallback = function() {}
 };
 
 module.exports = Stockfetch;

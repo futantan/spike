@@ -213,4 +213,47 @@ describe('Stockfetch tests', () => {
     stockfetch.processError('GOOG', '...oops...')
     printReportMock.verify()
   })
+
+  it('printReport should send price, errors once all responses arrive', () => {
+    stockfetch.prices = { 'GOOG': 12.34 }
+    stockfetch.errors = { 'APPL': 'error' }
+    stockfetch.tickersCount = 2
+    const callbackMock = sandbox.mock(stockfetch)
+                                .expects('reportCallback')
+                                .withArgs([['GOOG', 12.34]], [['APPL', 'error']])
+    stockfetch.printReport()
+    callbackMock.verify()
+  })
+
+  it('printReport should not send before all responses arrive', () => {
+    stockfetch.prices = { 'GOOG': 12.34 }
+    stockfetch.errors = { 'AAPL': 'error' }
+    stockfetch.tickersCount = 3
+    const callbackMock = sandbox.mock(stockfetch)
+                                .expects('reportCallback')
+                                .never()
+    stockfetch.printReport()
+    callbackMock.verify()
+  })
+
+  it('printReport should call sortData once for prices, once for errors', () => {
+    stockfetch.prices = { 'GOOG': 12.34 }
+    stockfetch.errors = { 'AAPL': 'error' }
+    stockfetch.tickersCount = 2
+    const mock = sandbox.mock(stockfetch)
+    mock.expects('sortData').withArgs(stockfetch.prices)
+    mock.expects('sortData').withArgs(stockfetch.errors)
+
+    stockfetch.printReport()
+    mock.verify()
+  })
+
+  it('sortData should sort the data based on the symbols', () => {
+    const dataToSort = {
+      'GOOG': 1.2,
+      'AAPL': 2.1
+    }
+    const result = stockfetch.sortData(dataToSort)
+    expect(result).to.be.eql([['AAPL', 2.1], ['GOOG', 1.2]])
+  })
 })
