@@ -53,6 +53,19 @@ const Stockfetch = function() {
   this.processHttpError = function(ticker, error) {
     this.processError(ticker, error.code)
   }
+
+  this.prices = {}
+  this.parsePrice = function(ticker, data) {
+    const price = data.split('\n')[1].split(',').pop()
+    this.prices[ticker] = price
+    this.printReport()
+  }
+  this.errors = {}
+  this.processError = function(ticker, error) {
+    this.errors[ticker] = error
+    this.printReport()
+  }
+  this.printReport = function() {}
 };
 
 module.exports = Stockfetch;
