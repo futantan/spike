@@ -180,4 +180,13 @@ describe('Stockfetch tests', () => {
     stockfetch.processResponse('GOOG', response)
     processErrorMock.verify()
   })
+
+  it('processHttpError should call processError with error details', () => {
+    const processErrorMock = sandbox.mock(stockfetch)
+                                    .expects('processError')
+                                    .withArgs('GOOG', '...error code...')
+    const error = {code: '...error code...'}
+    stockfetch.processHttpError('GOOG', error)
+    processErrorMock.verify()
+  })
 })
