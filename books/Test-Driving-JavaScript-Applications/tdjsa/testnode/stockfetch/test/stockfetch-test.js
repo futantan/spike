@@ -137,4 +137,47 @@ describe('Stockfetch tests', () => {
     sandbox.stub(stockfetch.http, 'get').returns({on: onStub})
     stockfetch.getPrice('GOOG')
   })
+
+  it('processResponse should call parsePrice with valid data', () => {
+    let dataFunction, endFunction
+    const response = {
+      statusCode: 200,
+      on: function(event, handler) {
+        if (event === 'data') dataFunction = handler
+        if (event === 'end') endFunction = handler
+      }
+    }
+
+    const parsePriceMock = sandbox.mock(stockfetch)
+                                  .expects('parsePrice').withArgs('GOOG', 'some data')
+    stockfetch.processResponse('GOOG', response)
+    dataFunction('some ')
+    dataFunction('data')
+    endFunction()
+
+    parsePriceMock.verify()
+  })
+
+  it('processResponse should call processError if response failed', () => {
+    const response = { statusCode: 404 }
+    const processErrorMock = sandbox.mock(stockfetch)
+                                    .expects('processError')
+                                    .withArgs('GOOG', 404)
+
+    stockfetch.processResponse('GOOG', response)
+    processErrorMock.verify()
+  })
+
+  it('processResponse should call processError only if response failed', () => {
+    const response = {
+      statusCode: 200,
+      on: () => {}
+    }
+    const processErrorMock = sandbox.mock(stockfetch)
+                                    .expects('processError')
+                                    .never()
+
+    stockfetch.processResponse('GOOG', response)
+    processErrorMock.verify()
+  })
 })
