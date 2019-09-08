@@ -5,8 +5,13 @@ package-lock.json
 
 .gradle
 */build/
+**/dist/
+**/.cache/
 !gradle/wrapper/gradle-wrapper.jar
 target/
+
+### ReasonML ###
+**/*.bs.js
 
 ### STS ###
 .apt_generated
@@ -145,3 +150,4 @@ erl_crash.dump
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
