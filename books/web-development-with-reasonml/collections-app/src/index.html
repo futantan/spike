@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Shirt Price Calculator</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+      .right {
+        text-align: right;
+      }
+      .center {
+        text-align: center;
+      }
+      th,
+      td {
+        border: 1px solid gray;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Shirt Price Calculator</h1>
+
+    <p>
+      Enter list of orders separated by commas:
+    </p>
+
+    <p>
+      <input
+        type="text"
+        size="40"
+        id="orders"
+        placeholder="Example: 3M, 4@XL, 5 S"
+      />
+      <button id="calculate">Calculate</button>
+    </p>
+
+    <h2>Results</h2>
+    <div id="table"></div>
+
+    <p>Total shirts: <span id="totalShirts"></span></p>
+    <p>Total price: $<span id="totalPrice"></span></p>
+
+    <script type="text/javascript" src="OrderPage.bs.js"></script>
+  </body>
+</html>
