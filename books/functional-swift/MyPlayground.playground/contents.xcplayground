@@ -3,5 +3,6 @@
     <pages>
         <page name='chap2'/>
         <page name='chap2_v2'/>
+        <page name='chap3'/>
     </pages>
 </playground>

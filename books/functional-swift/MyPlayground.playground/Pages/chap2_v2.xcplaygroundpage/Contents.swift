@@ -1,5 +1,3 @@
-import Cocoa
-
 typealias Distance = Double
 
 extension Position {
