@@ -1,3 +1,5 @@
+import Foundation
+
 typealias Distance = Double
 typealias Region = (Position) -> Bool
 

@@ -4,5 +4,7 @@
         <page name='chap2'/>
         <page name='chap2_v2'/>
         <page name='chap3'/>
+        <page name='QuickCheck'/>
+        <page name='chap 9'/>
     </pages>
 </playground>
