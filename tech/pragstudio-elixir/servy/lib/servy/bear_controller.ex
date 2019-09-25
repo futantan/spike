@@ -18,6 +18,7 @@ defmodule Servy.BearController do
     %{conv | status: 200, resp_body: BearView.show(bear)}
   end
 
+  @spec create(Servy.Conv.t(), map) :: Servy.Conv.t()
   def create(conv, %{"name" => name, "type" => type}) do
     %Conv{conv | status: 201, resp_body: "Created a #{type} bear named #{name}!"}
   end
