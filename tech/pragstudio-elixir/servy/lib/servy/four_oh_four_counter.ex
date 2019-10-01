@@ -1,60 +1,85 @@
-defmodule Servy.FourOhFourCounter do
-  @name :four_oh_four_counter
-
-  def start do
-    IO.puts("Starting the 404 counter...")
-    pid = spawn(__MODULE__, :listen_loop, [%{}])
-    Process.register(pid, @name)
+defmodule Servy.GenericServerx do
+  def start(callback_module, initial_state, name) do
+    pid = spawn(__MODULE__, :listen_loop, [initial_state, callback_module])
+    Process.register(pid, name)
     pid
   end
 
-  def bump_count(path) do
-    send(@name, {self(), :bump_count, path})
+  def call(pid, message) do
+    send(pid, {:call, self(), message})
 
     receive do
-      {:response, count} ->
-        count
+      {:response, response} ->
+        response
     end
   end
 
-  def get_counts do
-    send(@name, {self(), :get_counts})
+  def cast(pid, message) do
+    send(pid, {:cast, message})
+  end
 
+  def listen_loop(state, callback_module) do
     receive do
-      {:response, counts} ->
-        counts
+      {:call, sender, message} ->
+        {response, new_state} = callback_module.handle_call(message, state)
+        send(sender, {:response, response})
+        listen_loop(new_state, callback_module)
+
+      {:cast, message} ->
+        new_state = callback_module.handle_cast(message, state)
+        listen_loop(new_state, callback_module)
+
+      unexpected ->
+        IO.puts("Unexpected message: #{inspect(unexpected)}")
+        listen_loop(state, callback_module)
     end
+  end
+end
+
+defmodule Servy.FourOhFourCounter do
+  @name :four_oh_four_counter
+
+  alias Servy.GenericServerx
+
+  def start do
+    IO.puts("Starting the 404 counter...")
+    GenericServerx.start(__MODULE__, %{}, @name)
+  end
+
+  def bump_count(path) do
+    GenericServerx.call(@name, {:bump_count, path})
+  end
+
+  def get_counts do
+    GenericServerx.call(@name, :get_counts)
   end
 
   @spec get_count(any) :: any
   def get_count(path) do
-    send(@name, {self(), :get_count, path})
-
-    receive do
-      {:response, count} ->
-        count
-    end
+    GenericServerx.call(@name, {:get_count, path})
   end
 
-  def listen_loop(state) do
-    receive do
-      {sender, :bump_count, path} ->
-        new_state = Map.update(state, path, 1, &(&1 + 1))
-        send(sender, {:response, :ok})
-        listen_loop(new_state)
+  def reset do
+    GenericServerx.cast(@name, :reset)
+  end
 
-      {sender, :get_counts} ->
-        send(sender, {:response, state})
-        listen_loop(state)
+  # Server
 
-      {sender, :get_count, path} ->
-        count = Map.get(state, path, 0)
-        send(sender, {:response, count})
-        listen_loop(state)
+  def handle_call({:bump_count, path}, state) do
+    new_state = Map.update(state, path, 1, &(&1 + 1))
+    {:ok, new_state}
+  end
 
-      unexpected ->
-        IO.puts("Unexpected message: #{inspect(unexpected)}")
-        listen_loop(state)
-    end
+  def handle_call(:get_counts, state) do
+    {state, state}
+  end
+
+  def handle_call({:get_count, path}, state) do
+    count = Map.get(state, path, 0)
+    {count, state}
+  end
+
+  def handle_cast(:reset, _state) do
+    %{}
   end
 end
