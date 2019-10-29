@@ -10,7 +10,7 @@ package-lock.json
 **/.elixir_ls/
 !gradle/wrapper/gradle-wrapper.jar
 target/
-
+out/
 ### ReasonML ###
 **/*.bs.js
 
