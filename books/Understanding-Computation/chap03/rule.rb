@@ -84,7 +84,7 @@ class NFARulebook < Struct.new(:rules)
 
   def follow_free_moves(states)
     more_states = next_states(states, nil)
-    
+
   end
 end
 
@@ -115,6 +115,10 @@ class NFA < Struct.new(:current_states, :accept_states, :rulebook)
       read_character(character)
     end
   end
+
+  def current_states
+    rulebook.follow_free_moves(super)
+  end
 end
 
 # puts NFA.new(Set[1], [4], rulebook).accepting?
@@ -138,7 +142,7 @@ class NFADesign < Struct.new(:start_state, :accept_states, :rulebook)
   end
 end
 
-nfa_design = NFADesign.new(1, [4], rulebook)
+# nfa_design = NFADesign.new(1, [4], rulebook)
 # puts nfa_design.accepts?('bab')
 # puts nfa_design.accepts?('bbbbb')
 # puts nfa_design.accepts?('bbabb')
