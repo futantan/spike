@@ -9,7 +9,13 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"hardhat": "hardhat --config hardhat.config.cjs",
+		"hardhat:compile": "npm run hardhat compile",
+		"hardhat:run": "npm run hardhat run scripts/run.js",
+		"hardhat:deploy": "npm run hardhat run scripts/deploy.js -- --network localhost",
+		"hardhat:deploy:rinkeby": "npm run hardhat run scripts/deploy.js --network rinkeby",
+		"hardhat:test": "npm run hardhat test"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
