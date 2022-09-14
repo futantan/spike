@@ -12,6 +12,10 @@ module.exports = {
 		hardhat: {
       // https://hardhat.org/hardhat-network/docs/metamask-issue
 			chainId: 1337 // To be able to work with metamask in localhost
-		}
+		},
+		goerli: {
+      url: process.env.ALCHEMY_URL,
+      accounts: [process.env.ALCHEMY_PRIVATE_KEY]
+    }
 	}
 };
