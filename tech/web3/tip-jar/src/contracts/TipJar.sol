@@ -5,10 +5,14 @@ pragma solidity ^0.8.4; //same as hardhat.config.js
 import 'hardhat/console.sol'; // This allow you to use console.log
 
 contract TipJar {
-	uint256 totalTips; // store the number of the tips received;
+	uint256 public totalTips; // an integer public variable
 
-	address payable owner;
+	address payable public owner; // identify the owner (the address) of the contract
 
+	/*
+	 * Store the "Tip" data in a structure
+	 * the struct allow you to create a custom datatype
+	 */
 	struct Tip {
 		address sender; //The person who gives you the tip
 		string message; //A message from the sender;
@@ -16,30 +20,30 @@ contract TipJar {
 		uint256 timestamp; //When the tip was sent
 		uint256 amount; //the amount of ether sent to you
 	}
-
+	/*
+    store an array of structs to hold all the tips sent
+    */
 	Tip[] tips;
 
-	event NewTip(address indexed from, string message, uint256 amount);
-	event NewWithdraw(uint256 amount);
-
-	constructor() {
-		owner = payable(msg.sender); // set the contract creator based in who instantiated it
-	}
-
-	function sendTip(string memory _message, string memory _name) public payable {
-		require(msg.sender.balance >= msg.value, 'Not enough funds');
-		totalTips += 1;
-		tips.push(Tip(msg.sender, _message, _name, block.timestamp, msg.value));
-		emit NewTip(msg.sender, _message, msg.value);
-	}
-
-		/*
-	 * a function that give access to the stored tips struct
-	 * is just read from the blockchain so is marked as view
+	/*
+	 * Solidity magic, this defines an Event that can be trigger and sent to the clients
+	 * it will hold the address that trigger the event and will index that to allow for future search
+	 * it can also hold more information,. in this case the message, name and amount same as the struct above
 	 */
-	function getAllTips() public view returns (Tip[] memory) {
-		return tips;
+	event NewTip(address indexed from, string message, string name, uint256 amount);
+
+	event NewWithdrawl(uint256 amount);
+
+	/*
+	 * Constructor
+	 * it is called when the contract is deployed
+	 * it will set the owner of the contract
+	 */
+	constructor() {
+		owner = payable(msg.sender); // set the contract createor based in who instantitiated it
 	}
+
+	// Functions
 
 	/*
 	 * public funtion (like a getter) that returns the total number of tips
@@ -50,16 +54,41 @@ contract TipJar {
 		return totalTips;
 	}
 
-	modifier onlyOwner {
-		require(msg.sender == owner, 'caller is not the owner');
+	function sendTip(string memory _message, string memory _name) public payable {
+		require(msg.sender.balance >= msg.value, "Youd don't have enough funds"); // require that the sender has enough ether to send
+		totalTips += 1; //increase the amount of tips
+		tips.push(Tip(msg.sender, _message, _name, block.timestamp, msg.value)); // Store the tip
+
+		// send the event
+		emit NewTip(msg.sender, _message, _name, msg.value);
+	}
+
+	/*
+	 * a function that give access to the stored tips struct
+	 * is just read from the blockchain so is marked as view
+	 */
+	function getAllTips() public view returns (Tip[] memory) {
+		return tips;
+	}
+
+	/**
+	 * A modifier function that ensure that an action is made only by the owner of the contract
+	 * Throws if called by any account other than the owner.
+	 */
+
+	modifier onlyOwner() {
+		require(owner == msg.sender, 'caller is not the owner');
 		_;
 	}
 
+	/*
+	 * Allow the owner to withdraw all the ether in the contract
+	 */
 	function withdraw() public onlyOwner {
-		uint256 amount = address(this).balance;
+		uint256 amount = address(this).balance; // get the amount of ether in the contract
 		require(amount > 0, 'You have no ether to withdraw');
 		(bool success, ) = owner.call{value: amount}('');
 		require(success, 'Withdraw failed');
-		emit NewWithdraw(amount);
+		emit NewWithdrawl(amount);
 	}
 }
