@@ -1,4 +1,4 @@
-/// chapter 4.3
+/// chapter 4.4
 
 
 // 用一个全局变量存储被注册的副作用函数
@@ -6,17 +6,25 @@ let activeEffect
 
 // effect 函数用于注册副作用函数
 function effect(fn) {
-  // 当调用 effect 注册副作用函数时，将副作用函数 fn 赋值给 activeEffect
-  activeEffect = fn
+  const effectFn = () => {
+    // 调用 cleanup 函数完成清除操作
+    cleanup(effectFn)
+    // 当 effectFn 执行时，将其设置为当前激活的副作用函数
+    activeEffect = effectFn
+    fn()
+  }
+
+  // activeEffect.deps 用来存储所有与该副作用函数相关联的依赖集合
+  effectFn.deps = []
   // 执行副作用函数
-  fn()
+  effectFn()
 }
 
 // 存储副作用函数的桶
 const bucket = new WeakMap()
 
 // 原始数据
-const data = { text: 'hello world' }
+const data = { ok: true, text: 'hello world' }
 
 // 对原始数据的代理
 const obj = new Proxy(data, {
@@ -55,6 +63,8 @@ function track(target, key) {
 
   // 最后将当前激活的副作用函数添加到“桶”里
   deps.add(activeEffect)
+  // 将其添加到 activeEffect.deps 中
+  activeEffect.deps.push(deps)
 }
 
 function trigger(target, key) {
@@ -63,14 +73,30 @@ function trigger(target, key) {
   if (!depsMap) return
 
   const effects = depsMap.get(key)
-  effects && effects.forEach(fn => fn())
+
+  // 这里重新用 Set 转换，是为了方式 delete 同时也 add 造成死循环
+  const effectsToRun = new Set(effects)
+  effectsToRun.forEach(fn => fn())
+}
+
+function cleanup(effectFn) {
+  for (let i = 0; i < effectFn.deps.length; i++) {
+    // deps 是依赖集合 Set
+    const deps = effectFn.deps[i]
+    deps.delete(effectFn)
+  }
+  effectFn.deps.length = 0
 }
 
 effect(() => {
-  console.log(obj.text)
+  console.log(obj.ok ? obj.text : 'not')
 })
 
 // 1 秒后修改响应式数据
 setTimeout(() => {
-  obj.text = 'hello vue3'
+  obj.ok = false
+  setTimeout(() => {
+    obj.text = 'random'
+  }, 1000)
 }, 1000)
+
