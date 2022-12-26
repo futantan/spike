@@ -1,4 +1,4 @@
-/// chapter 4.5
+/// chapter 4.6
 
 
 // 用一个全局变量存储当前激活的 effect 函数
@@ -32,7 +32,7 @@ function effect(fn) {
 const bucket = new WeakMap()
 
 // 原始数据
-const data = { foo: true, bar: true }
+const data = { foo: 1}
 
 // 对原始数据的代理
 const obj = new Proxy(data, {
@@ -83,8 +83,14 @@ function trigger(target, key) {
   const effects = depsMap.get(key)
 
   // 这里重新用 Set 转换，是为了方式 delete 同时也 add 造成死循环
-  const effectsToRun = new Set(effects)
-  effectsToRun.forEach(fn => fn())
+  const effectsToRun = new Set()
+  effects.forEach(effectFn => {
+    // 如果 trigger 触发执行的副作用函数与当前正在执行的副作用函数相同，则不触发执行
+    if (effectFn !== activeEffect) {
+      effectsToRun.add(effectFn)
+    }
+  })
+  effectsToRun.forEach(effectFn => effectFn())
 }
 
 function cleanup(effectFn) {
@@ -96,19 +102,7 @@ function cleanup(effectFn) {
   effectFn.deps.length = 0
 }
 
-let temp1, temp2
 effect(function effectFn1() {
-  console.log('effectFn1 执行')
-
-  effect(function effectFn2() {
-    console.log('effectFn2 执行')
-    temp2 = obj.bar
-  })
-
-  // 在 effectFn1 中读取 obj.foo
-  temp1 = obj.foo
+  obj.foo++
 })
 
-
-console.log('begin')
-obj.foo = false
