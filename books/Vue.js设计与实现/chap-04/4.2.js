@@ -1,8 +1,11 @@
-/// chapter 4.4
+/// chapter 4.5
 
 
-// 用一个全局变量存储被注册的副作用函数
+// 用一个全局变量存储当前激活的 effect 函数
 let activeEffect
+
+// effect 栈
+const effectStack = []
 
 // effect 函数用于注册副作用函数
 function effect(fn) {
@@ -11,7 +14,12 @@ function effect(fn) {
     cleanup(effectFn)
     // 当 effectFn 执行时，将其设置为当前激活的副作用函数
     activeEffect = effectFn
+    // 在调用副作用函数之前将当前副作用函数压入栈中
+    effectStack.push(activeEffect)
     fn()
+    // 调用完副作用函数后，将其从栈中弹出，并把 activeEffect 还原为之前的值
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   }
 
   // activeEffect.deps 用来存储所有与该副作用函数相关联的依赖集合
@@ -24,7 +32,7 @@ function effect(fn) {
 const bucket = new WeakMap()
 
 // 原始数据
-const data = { ok: true, text: 'hello world' }
+const data = { foo: true, bar: true }
 
 // 对原始数据的代理
 const obj = new Proxy(data, {
@@ -88,15 +96,19 @@ function cleanup(effectFn) {
   effectFn.deps.length = 0
 }
 
-effect(() => {
-  console.log(obj.ok ? obj.text : 'not')
+let temp1, temp2
+effect(function effectFn1() {
+  console.log('effectFn1 执行')
+
+  effect(function effectFn2() {
+    console.log('effectFn2 执行')
+    temp2 = obj.bar
+  })
+
+  // 在 effectFn1 中读取 obj.foo
+  temp1 = obj.foo
 })
 
-// 1 秒后修改响应式数据
-setTimeout(() => {
-  obj.ok = false
-  setTimeout(() => {
-    obj.text = 'random'
-  }, 1000)
-}, 1000)
 
+console.log('begin')
+obj.foo = false
