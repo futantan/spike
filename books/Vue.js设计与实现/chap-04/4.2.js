@@ -172,9 +172,61 @@ function computed(getter) {
   return obj
 }
 
-const sumRes = computed(() => {
-  console.log('in side effect')
-  return obj.foo + obj.bar
-})
-console.log(sumRes.value)
-console.log(sumRes.value)
+// const sumRes = computed(() => {
+//   console.log('in side effect')
+//   return obj.foo + obj.bar
+// })
+// console.log(sumRes.value)
+// console.log(sumRes.value)
+
+
+function watch(source, cb) {
+  let getter
+
+  if (typeof source === 'function') {
+    getter = source
+  } else {
+    getter = () => traverse(source)
+  }
+
+  let oldValue, newValue
+
+  const effectFn = effect(
+    () => getter(),
+    {
+      lazy: true,
+      scheduler() {
+        newValue = effectFn()
+        // 当数据发生变化时，调用回调函数 cb
+        cb(newValue, oldValue)
+        oldValue = newValue
+      }
+    }
+  )
+
+  oldValue = effectFn()
+}
+
+function traverse(value, seen = new Set()) {
+  // 如果要读取的数据是原始值，或者已经被读取过了，那么什么都不做
+  if (typeof value !== 'object' || value === null || seen.has(value)) {
+    return
+  }
+  // 将数据添加到 seen 中，代表遍历地读取过了，避免循环引用引起的死循环
+  seen.add(value)
+  // 赞不考虑数组等其他结构
+  // 假设 value 就是一个对象，使用 for ... in 读取对象的每一个值，并递归地调用 traverse 进行处理
+  for (const k in value) {
+    traverse(value[k], seen)
+  }
+  return value
+}
+
+watch(
+  () => obj.foo,
+  (newVal, oldVal) => {
+    console.log(newVal, oldVal);
+  }
+)
+
+obj.foo++
