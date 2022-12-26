@@ -1,4 +1,4 @@
-/// chapter 4.9
+/// chapter 4.10
 
 
 // 用一个全局变量存储当前激活的 effect 函数
@@ -180,7 +180,7 @@ function computed(getter) {
 // console.log(sumRes.value)
 
 
-function watch(source, cb) {
+function watch(source, cb, options = {}) {
   let getter
 
   if (typeof source === 'function') {
@@ -191,20 +191,34 @@ function watch(source, cb) {
 
   let oldValue, newValue
 
+  const job = () => {
+    newValue = effectFn()
+    // 当数据发生变化时，调用回调函数 cb
+    cb(newValue, oldValue)
+    oldValue = newValue
+  }
+
   const effectFn = effect(
     () => getter(),
     {
       lazy: true,
-      scheduler() {
-        newValue = effectFn()
-        // 当数据发生变化时，调用回调函数 cb
-        cb(newValue, oldValue)
-        oldValue = newValue
+      scheduler: () => {
+        // 在调度函数中判断 flush 是否为 post，如果是，将其放到微任务队列中
+        if (options.flush === 'post') {
+          const p = Promise.resolve()
+          p.then(job)
+        } else {
+          job()
+        }
       }
     }
   )
 
-  oldValue = effectFn()
+  if (options.immediate) {
+    job()
+  } else {
+    oldValue = effectFn()
+  }
 }
 
 function traverse(value, seen = new Set()) {
