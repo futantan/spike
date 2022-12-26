@@ -1,4 +1,4 @@
-/// chapter 4.10
+/// chapter 4.11
 
 
 // 用一个全局变量存储当前激活的 effect 函数
@@ -191,10 +191,19 @@ function watch(source, cb, options = {}) {
 
   let oldValue, newValue
 
+  let cleanup
+  function onInvalidate(fn) {
+    cleanup = fn
+  }
+
   const job = () => {
     newValue = effectFn()
+    // 在调用回调函数之前，先调用 cleanup 函数
+    if (cleanup) {
+      cleanup()
+    }
     // 当数据发生变化时，调用回调函数 cb
-    cb(newValue, oldValue)
+    cb(newValue, oldValue, onInvalidate)
     oldValue = newValue
   }
 
