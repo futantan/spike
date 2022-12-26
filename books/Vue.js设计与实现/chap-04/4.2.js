@@ -1,4 +1,4 @@
-/// chapter 4.6
+/// chapter 4.7
 
 
 // 用一个全局变量存储当前激活的 effect 函数
@@ -8,7 +8,7 @@ let activeEffect
 const effectStack = []
 
 // effect 函数用于注册副作用函数
-function effect(fn) {
+function effect(fn, options = {}) {
   const effectFn = () => {
     // 调用 cleanup 函数完成清除操作
     cleanup(effectFn)
@@ -22,6 +22,8 @@ function effect(fn) {
     activeEffect = effectStack[effectStack.length - 1]
   }
 
+  // 将 options 挂载到 effectFn 上
+  effectFn.options = options
   // activeEffect.deps 用来存储所有与该副作用函数相关联的依赖集合
   effectFn.deps = []
   // 执行副作用函数
@@ -90,7 +92,14 @@ function trigger(target, key) {
       effectsToRun.add(effectFn)
     }
   })
-  effectsToRun.forEach(effectFn => effectFn())
+  effectsToRun.forEach(effectFn => {
+    // 如果副作用函数有 scheduler 选项，则调用 scheduler 函数
+    if (effectFn.options.scheduler) {
+      effectFn.options.scheduler(effectFn)
+    } else {
+      effectFn()
+    }
+  })
 }
 
 function cleanup(effectFn) {
@@ -102,7 +111,39 @@ function cleanup(effectFn) {
   effectFn.deps.length = 0
 }
 
-effect(function effectFn1() {
-  obj.foo++
-})
+// 定义一个任务队列, 注意这里的关键就是使用了 Set，从而做到了去重，让同一个 job 只会执行一次
+const jobQueue = new Set()
+// 使用 Promise.resolve() 创建一个 promise 实例，我们用它将一个任务添加到微任务队列中
+const p = Promise.resolve()
+// 一个标志代表是否正在刷新队列
+let isFlushing = false
+function flushJob() {
+  // 如果队列正在刷新，则什么都不做
+  if (isFlushing) return
+  // 设置为 true，代表正在刷新队列
+  isFlushing = true
+  // 在微任务队列中刷新 jobQueue 队列
+  p.then(() => {
+    jobQueue.forEach(job => job())
+  }).finally(() => {
+    isFlushing = false;
+  })
+}
 
+effect(
+  () => {
+    console.log(obj.foo);
+  },
+  {
+    scheduler(fn) {
+      // 每次调度时，将副作用函数添加到 jobQueue 队列中
+      jobQueue.add(fn)
+      // 调用 flushJob 刷新队列
+      flushJob()
+    },
+  }
+);
+
+
+obj.foo++
+obj.foo++
