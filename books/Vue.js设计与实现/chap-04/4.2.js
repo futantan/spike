@@ -1,4 +1,4 @@
-/// chapter 4.7
+/// chapter 4.8
 
 
 // 用一个全局变量存储当前激活的 effect 函数
@@ -16,25 +16,32 @@ function effect(fn, options = {}) {
     activeEffect = effectFn
     // 在调用副作用函数之前将当前副作用函数压入栈中
     effectStack.push(activeEffect)
-    fn()
+    const res = fn()
     // 调用完副作用函数后，将其从栈中弹出，并把 activeEffect 还原为之前的值
     effectStack.pop()
     activeEffect = effectStack[effectStack.length - 1]
+    return res
   }
 
   // 将 options 挂载到 effectFn 上
   effectFn.options = options
   // activeEffect.deps 用来存储所有与该副作用函数相关联的依赖集合
   effectFn.deps = []
-  // 执行副作用函数
-  effectFn()
+  // 只有非 lazy 的时候，才执行
+  if (!options.lazy) {
+    // 执行副作用函数
+    effectFn()
+  }
+
+  // 将副作用函数作为返回值返回
+  return effectFn
 }
 
 // 存储副作用函数的桶
 const bucket = new WeakMap()
 
 // 原始数据
-const data = { foo: 1}
+const data = { foo: 1, bar: 2 }
 
 // 对原始数据的代理
 const obj = new Proxy(data, {
@@ -130,20 +137,44 @@ function flushJob() {
   })
 }
 
-effect(
-  () => {
-    console.log(obj.foo);
-  },
-  {
-    scheduler(fn) {
-      // 每次调度时，将副作用函数添加到 jobQueue 队列中
-      jobQueue.add(fn)
-      // 调用 flushJob 刷新队列
-      flushJob()
-    },
+function computed(getter) {
+  // value 用来缓存上一次计算的值
+  let value
+  // dirty 标志，用来标识是否需要重新计算值，为 true 则意味着”脏“，需要计算
+  let dirty = true
+
+  // 把 getter 作为副作用函数，创建一个 lazy 的 effect
+  const effectFn = effect(getter, {
+    lazy: true,
+    scheduler() {
+      if (!dirty) {
+        dirty = true
+        // 当计算属性依赖的响应式数据变化时，手动调用 trigger 函数触发响应
+        trigger(obj, 'value')
+      }
+    }
+  })
+
+  const obj = {
+    get value() {
+      // 只有 dirty 为 true 时，才会重新计算值，并进行缓存
+      if (dirty) {
+        value = effectFn()
+        // 将 dirty 设置为 false，下一次访问直接使用缓存到 value 中的值
+        dirty = false
+      }
+      // 当读取 value 时，手动调用 track 函数进行追踪
+      track(obj, 'value')
+      return value
+    }
   }
-);
 
+  return obj
+}
 
-obj.foo++
-obj.foo++
+const sumRes = computed(() => {
+  console.log('in side effect')
+  return obj.foo + obj.bar
+})
+console.log(sumRes.value)
+console.log(sumRes.value)
