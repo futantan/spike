@@ -1,4 +1,4 @@
-/// chapter 4.8
+/// chapter 4.9
 
 
 // 用一个全局变量存储当前激活的 effect 函数
