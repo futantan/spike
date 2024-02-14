@@ -6,37 +6,35 @@ dotenv.config();
 const mainnetKey = process.env.mainnetKey;
 const goerliKey = process.env.goerliKey;
 // 连接以太坊主网
-const providerETH = new ethers.providers.JsonRpcProvider(mainnetKey);
+const providerETH = new ethers.JsonRpcProvider(mainnetKey);
 // 连接Goerli测试网
-const providerGoerli = new ethers.providers.JsonRpcProvider(goerliKey);
+const providerGoerli = new ethers.JsonRpcProvider(goerliKey);
 
 // 1. 查询vitalik在主网和Goerli测试网的ETH余额
 console.log('1. 查询vitalik在主网和Goerli测试网的ETH余额');
 const balance = await providerETH.getBalance(`vitalik.eth`);
 const balanceGoerli = await providerGoerli.getBalance(`vitalik.eth`);
 // 将余额输出在 console（主网）
-console.log(`ETH Balance of vitalik: ${ethers.utils.formatEther(balance)} ETH`);
+console.log(`ETH Balance of vitalik: ${ethers.formatEther(balance)} ETH`);
 // 输出Goerli测试网ETH余额
 console.log(
-  `Goerli ETH Balance of vitalik: ${ethers.utils.formatEther(
-    balanceGoerli
-  )} ETH`
+  `Goerli ETH Balance of vitalik: ${ethers.formatEther(balanceGoerli)} ETH`
 );
 
 // 2. 查询provider连接到了哪条链
 console.log('\n2. 查询provider连接到了哪条链');
 const network = await providerETH.getNetwork();
-console.log(network);
+console.log(network.toJSON());
 
 // 3. 查询区块高度
 console.log('\n3. 查询区块高度');
 const blockNumber = await providerETH.getBlockNumber();
 console.log(`Current block number: ${blockNumber}`);
 
-// 4. 查询当前gas price
-console.log('\n4. 查询当前gas price');
-const gasPrice = await providerETH.getGasPrice();
-console.log(gasPrice.toString());
+// 4. 查询 vitalik 钱包历史交易次数
+console.log('\n4. 查询 vitalik 钱包历史交易次数');
+const txCount = await providerETH.getTransactionCount('vitalik.eth');
+console.log(txCount);
 
 // 5. 查询当前建议的gas设置
 console.log('\n5. 查询当前建议的gas设置');
