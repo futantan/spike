@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 dotenv.config();
 
 const mainnetKey = process.env.mainnetKey;
-const provider = new ethers.providers.JsonRpcProvider(mainnetKey);
+const provider = new ethers.JsonRpcProvider(mainnetKey);
 
 // 第1种输入abi的方式: 复制abi全文
 // WETH的abi可以在这里复制：https://etherscan.io/token/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2#code
@@ -31,9 +31,9 @@ const main = async () => {
   console.log(`合约地址: ${addressWETH}`);
   console.log(`名称: ${nameWETH}`);
   console.log(`代号: ${symbolWETH}`);
-  console.log(`总供给: ${ethers.utils.formatEther(totalSupplyWETH)}`);
+  console.log(`总供给: ${ethers.formatEther(totalSupplyWETH)}`);
   const balanceWETH = await contractWETH.balanceOf('vitalik.eth');
-  console.log(`Vitalik持仓: ${ethers.utils.formatEther(balanceWETH)}\n`);
+  console.log(`Vitalik持仓: ${ethers.formatEther(balanceWETH)}\n`);
 
   // 2. 读取DAI合约的链上信息（IERC20接口合约）
   const nameDAI = await contractDAI.name();
@@ -43,9 +43,9 @@ const main = async () => {
   console.log(`合约地址: ${addressDAI}`);
   console.log(`名称: ${nameDAI}`);
   console.log(`代号: ${symbolDAI}`);
-  console.log(`总供给: ${ethers.utils.formatEther(totalSupplDAI)}`);
+  console.log(`总供给: ${ethers.formatEther(totalSupplDAI)}`);
   const balanceDAI = await contractDAI.balanceOf('vitalik.eth');
-  console.log(`Vitalik持仓: ${ethers.utils.formatEther(balanceDAI)}\n`);
+  console.log(`Vitalik持仓: ${ethers.formatEther(balanceDAI)}\n`);
 };
 
 main();
